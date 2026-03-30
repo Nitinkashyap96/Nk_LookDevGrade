@@ -12,9 +12,7 @@ Author: Nitin Kashyap
 
 Version: 1.0
 
-Last Updated: 31 March 2026
-
-Platform: Foundry Nuke (12+)
+Nuke (12+)
 
 Install: ~/.nuke/ (no external .nk file required)
 
@@ -30,7 +28,7 @@ aa_LookDevGrade_builder.py, no external .nk gizmo file is needed. All
 internal wiring, expressions, and knob definitions live in one Python
 module.
 
-Installation
+# Installation
 
 File Layout
 
@@ -47,29 +45,29 @@ menu.py Contents
 Your menu.py should contain the following (no other code from the
 builder is needed):
 
-  import nuke
-
-  import Nk_LookDevGrade_builder
-
-  toolbar = nuke.toolbar("Nodes")
-
-  m = toolbar.addMenu("Nk_Tools", icon="icon_256.png")
-
-  m.addCommand(
-
-  "LookDev Grade",
-
-  nk_LookDevGrade_builder._create_nk_LookDevGrade,
-
-  icon="icon_256.png",
-
-  tooltip="Nk_LookDevGrade — LookDev Grade by Nitin Kashyap | v1.0 | 31
-  Mar 2026"
-
-  )
-
-  print("[Nk_LookDevGrade] Registered — Nodes > Nk_Tools > LookDev
-  Grade")
+      import nuke
+    
+      import Nk_LookDevGrade_builder
+    
+      toolbar = nuke.toolbar("Nodes")
+    
+      m = toolbar.addMenu("Nk_Tools", icon="icon_256.png")
+    
+      m.addCommand(
+    
+      "LookDev Grade",
+    
+      nk_LookDevGrade_builder._create_nk_LookDevGrade,
+    
+      icon="icon_256.png",
+    
+      tooltip="Nk_LookDevGrade — LookDev Grade by Nitin Kashyap | v1.0 | 31
+      Mar 2026"
+    
+      )
+    
+      print("[Nk_LookDevGrade] Registered — Nodes > Nk_Tools > LookDev
+      Grade")
 
 Important: Pass the function reference _create_aa_LookDevGrade without
 parentheses. Nuke's addCommand expects a callable, not the result of
