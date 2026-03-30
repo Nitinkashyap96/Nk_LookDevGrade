@@ -1,0 +1,169 @@
+Gizmo {
+ inputs 2
+ name aa_LookDevGrade
+ addUserKnob {20 LookDevGrade_tab l "aa_LookDevGrade"}
+ addUserKnob {26 title_label l "" +STARTLINE T "<b><font size=5><font color=#dddddd>LookDev</font><font color=#5b9bd5>·Grade</font></font></b><br><font color=#5b9bd5><small>by asier aparicio</small></font>"}
+ addUserKnob {26 div_wb l "" +STARTLINE T " "}
+ addUserKnob {7 temperature l Temperature R -1 1}
+ temperature 0
+ addUserKnob {7 tint l Tint R -1 1}
+ tint -0.02
+ addUserKnob {26 div_bw l "" +STARTLINE T " "}
+ addUserKnob {18 blackpoint l Blackpoint R -0.5 0.5}
+ blackpoint {0 0 0 0}
+ addUserKnob {6 blackpoint_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {18 whitepoint l Whitepoint R 0 2}
+ whitepoint {1 1 1 1}
+ addUserKnob {6 whitepoint_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 div_exp l "" +STARTLINE T " "}
+ addUserKnob {7 exposure l Exposure R -2 2}
+ exposure -0.16
+ addUserKnob {7 contrast l Contrast R 0 2}
+ contrast 1.18
+ addUserKnob {7 grey_point l "Grey Point" R 0 1}
+ grey_point 0.18
+ addUserKnob {7 soft_contrast l "Soft Contrast" R 0 1}
+ soft_contrast 0.94
+ addUserKnob {26 div_clar l "" +STARTLINE T " "}
+ addUserKnob {4 clarity_op l "Clarity Operation" M {"High Pass" "Unsharp Mask" "Off"}}
+ clarity_op 0
+ addUserKnob {7 clarity_amount l "Clarity Amount" R 0 0.1}
+ clarity_amount 0.035
+ addUserKnob {7 vibrance l Vibrance R 0 2}
+ vibrance 0.9
+ addUserKnob {7 saturation l Saturation R 0 2}
+ saturation 1
+ addUserKnob {26 div_lift l "" +STARTLINE T " "}
+ addUserKnob {18 lift l Lift R -0.5 0.5}
+ lift {0 0 0 0}
+ addUserKnob {6 lift_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 lift_intensity l "Lift Intensity" R -1 1}
+ lift_intensity 0
+ addUserKnob {26 div_gamma l "" +STARTLINE T " "}
+ addUserKnob {18 gamma_col l Gamma R 0.2 4}
+ gamma_col {1 1 1 1}
+ addUserKnob {6 gamma_col_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 gamma_intensity l "Gamma Intensity" R 0 2}
+ gamma_intensity 1
+ addUserKnob {26 div_gain l "" +STARTLINE T " "}
+ addUserKnob {18 gain_col l Gain R 0 4}
+ gain_col {1 1 1 1}
+ addUserKnob {6 gain_col_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 gain_intensity l "Gain Intensity" R 0 2}
+ gain_intensity 1
+ addUserKnob {26 div_mix l "" +STARTLINE T " "}
+ addUserKnob {7 mix l mix R 0 1}
+ mix 1
+}
+
+Input {
+ inputs 0
+ name Input
+ xpos 0
+ ypos -500
+ number 0
+}
+
+Input {
+ inputs 0
+ name mask
+ xpos 160
+ ypos -500
+ number 1
+}
+
+Grade {
+ inputs 1 +mask
+ name BWPoint
+ blackpoint {{parent.blackpoint.r} {parent.blackpoint.g} {parent.blackpoint.b} 0}
+ whitepoint {{parent.whitepoint.r} {parent.whitepoint.g} {parent.whitepoint.b} 1}
+ xpos 0
+ ypos -420
+}
+
+Expression {
+ name TempTint
+ expr0 "r + parent.temperature * 0.1"
+ expr1 "g + parent.tint * 0.05"
+ expr2 "b - parent.temperature * 0.1"
+ xpos 0
+ ypos -360
+}
+
+Grade {
+ name ExpGrade
+ multiply {{pow(2,parent.exposure)} {pow(2,parent.exposure)} {pow(2,parent.exposure)} 1}
+ xpos 0
+ ypos -300
+}
+
+Expression {
+ name ContrGrey
+ expr0 "(r - parent.grey_point) * parent.contrast + parent.grey_point"
+ expr1 "(g - parent.grey_point) * parent.contrast + parent.grey_point"
+ expr2 "(b - parent.grey_point) * parent.contrast + parent.grey_point"
+ xpos 0
+ ypos -240
+}
+
+set Npre [stack 0]
+
+Blur {
+ name ClarBlur
+ size {{parent.clarity_amount * 30}}
+ xpos 160
+ ypos -240
+}
+
+push $Npre
+
+Merge2 {
+ inputs 2
+ name ClarMerge
+ operation soft-light
+ mix {{parent.clarity_amount * 10 * (parent.clarity_op != 2)}}
+ xpos 0
+ ypos -180
+}
+
+Saturation {
+ name VibNode
+ saturation {{parent.vibrance}}
+ xpos 0
+ ypos -120
+}
+
+Saturation {
+ name SatNode
+ saturation {{parent.saturation}}
+ xpos 0
+ ypos -60
+}
+
+Grade {
+ name LGG
+ blackpoint {{parent.lift.r * parent.lift_intensity} {parent.lift.g * parent.lift_intensity} {parent.lift.b * parent.lift_intensity} 0}
+ white {{parent.gain_col.r * parent.gain_intensity} {parent.gain_col.g * parent.gain_intensity} {parent.gain_col.b * parent.gain_intensity} 1}
+ gamma {{parent.gamma_col.r * parent.gamma_intensity} {parent.gamma_col.g * parent.gamma_intensity} {parent.gamma_col.b * parent.gamma_intensity} 1}
+ xpos 0
+ ypos 0
+}
+
+set Npost [stack 0]
+
+push $Npre
+
+Dissolve {
+ inputs 2
+ name MixOut
+ which {{parent.mix}}
+ xpos 0
+ ypos 60
+}
+
+Output {
+ name Output
+ xpos 0
+ ypos 120
+}
+end_group
